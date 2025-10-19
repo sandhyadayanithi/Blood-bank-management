@@ -44,6 +44,10 @@ public class Client {
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
+            Random rand = new Random();
+            int idNum = rand.nextInt(9000) + 1000; 
+            String clientId = "C" + idNum;
+            System.out.println("Your unique ID number is: "+clientId);
             System.out.print("Enter your name: ");
             String name = sc.nextLine();
             System.out.print("Enter your location (city): ");
@@ -58,7 +62,7 @@ public class Client {
 
             String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
             String clientData = String.join(", ",
-                    name, location, bloodType,
+                    clientId,name, location, bloodType,
                     String.valueOf(quantity),
                     String.valueOf(urgency),
                     "Pending", date);
