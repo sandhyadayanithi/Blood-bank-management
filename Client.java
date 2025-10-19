@@ -46,7 +46,7 @@ public class Client {
 
             Random rand = new Random();
             int idNum = rand.nextInt(900) + 100; 
-            String clientId = "BB" + idNum;
+            String clientId = "C" + idNum;
             System.out.println("Your unique ID number is: "+clientId);
             System.out.print("Enter your name: ");
             String name = sc.nextLine();
