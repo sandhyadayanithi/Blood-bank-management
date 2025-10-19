@@ -20,7 +20,7 @@ public class Main {
                 case 1:
                     // Check if port 5000 is available
                     if (!isPortAvailable(5000)) {
-                        System.out.println("❌ AdminServer already running on port 5000. Start client instead.");
+                        System.out.println(" AdminServer already running on port 5000. Start client instead.");
                         break;
                     }
                     System.out.println("Starting Admin Server...");

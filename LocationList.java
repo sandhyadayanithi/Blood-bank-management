@@ -18,7 +18,6 @@ public class LocationList {
         return head;
     }
 
-    // Debug print
     public void display() {
         LocationNode temp = head;
         while (temp != null) {

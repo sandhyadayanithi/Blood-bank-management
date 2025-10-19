@@ -72,7 +72,7 @@ public class BloodBankData {
                 writer.write(r.toString());
                 writer.newLine();
             }
-            System.out.println("✅ BloodBank.txt created successfully with 100 Tamil Nadu–based records.");
+            System.out.println(" BloodBank.txt created successfully with 100 Tamil Nadu–based records.");
         } catch (IOException e) {
             e.printStackTrace();
         }
