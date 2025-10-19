@@ -186,21 +186,45 @@ public class AdminServer {
         } catch(Exception e){ System.out.println("Error reading BloodBank.txt"); }
     }
 
-    private static synchronized void viewPendingClients(){
+    private static synchronized void viewPendingClients() {
         File f = new File("Clients.txt");
-        if(!f.exists()){ System.out.println("No clients found."); return;}
-        try(BufferedReader br = new BufferedReader(new FileReader(f))){
-            String header = br.readLine();
-            if(header!=null) System.out.println(header);
+        if (!f.exists()) { System.out.println("No clients found."); return; }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+            String header = br.readLine(); // first line = header
+            List<String[]> pendingClients = new ArrayList<>();
+
             String line;
-            while((line=br.readLine())!=null){
+            while ((line = br.readLine()) != null) {
                 String[] data = line.split(",");
-                if(data.length > 5 && (data[5].trim().equalsIgnoreCase("Pending") || 
-                   data[5].trim().equalsIgnoreCase("Still in Need")))
-                    System.out.println(line);
+                for(int i=0;i<data.length;i++) data[i] = data[i].trim(); // trim spaces
+                if(data.length > 6 && 
+                (data[6].equalsIgnoreCase("Pending") || data[6].equalsIgnoreCase("Still in Need"))) {
+                    pendingClients.add(data);
+                }
             }
-        } catch(Exception e){ System.out.println("Error reading Clients.txt"); }
+
+            if(pendingClients.isEmpty()) {
+                System.out.println("No pending clients found.");
+                return;
+            }
+
+            // Sort based on Urgency (index 5)
+            pendingClients.sort((a, b) -> Integer.parseInt(a[5]) - Integer.parseInt(b[5]));
+
+            // Print header
+            System.out.println(header);
+
+            // Print sorted clients
+            for(String[] c : pendingClients) {
+                System.out.println(String.join(", ", c));
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error reading Clients.txt");
+        }
     }
+
 
     private static synchronized void allocateBloodInteractive(Scanner sc){
         System.out.print("Enter Client Name to allocate blood: ");
