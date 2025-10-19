@@ -72,10 +72,10 @@ public class Client {
             System.out.println(response);  // shows server message
 
             // Extra clear message for the client
-            System.out.println("ℹ️ Your request is pending. Please wait for admin allocation.");
+            System.out.println("Your request is pending. Please wait for admin allocation.");
 
         } catch (IOException e) {
-            System.out.println("❌ Could not connect to server. Make sure AdminServer is running.");
+            System.out.println(" Could not connect to server. Make sure AdminServer is running.");
         }
     }
 
@@ -92,7 +92,7 @@ public class Client {
             System.out.println(in.readLine());
 
         } catch (IOException e) {
-            System.out.println("❌ Could not connect to server. Make sure AdminServer is running.");
+            System.out.println(" Could not connect to server. Make sure AdminServer is running.");
         }
     }
 }

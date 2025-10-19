@@ -1,9 +1,9 @@
 import java.util.ArrayList;
 
 public class LocationNode {
-    String locationName;
-    ArrayList<BloodBankRecord> banks;
-    LocationNode next;
+    public String locationName;
+    public ArrayList<Bank> banks;
+    public LocationNode next;
 
     public LocationNode(String locationName) {
         this.locationName = locationName;
@@ -11,7 +11,7 @@ public class LocationNode {
         this.next = null;
     }
 
-    public void addBank(BloodBankRecord bank) {
+    public void addBank(Bank bank) {
         banks.add(bank);
     }
 }
