@@ -1,7 +1,7 @@
 import java.util.*;
 
 public class Bank {
-    public int ID;
+    public String ID;
     public String name;
     public String location;
     public ArrayList<Blood> bloodType;
@@ -10,7 +10,7 @@ public class Bank {
         this.bloodType = new ArrayList<>();
     }
 
-    public Bank(int ID, String name, String location, ArrayList<Blood> bloodType) {
+    public Bank(String ID, String name, String location, ArrayList<Blood> bloodType) {
         this.ID = ID;
         this.name = name;
         this.location = location;
@@ -22,7 +22,7 @@ public class Bank {
         Scanner sc = new Scanner(System.in);
         System.out.println("Enter the bank details:");
         System.out.print("Enter the bank ID: ");
-        this.ID = sc.nextInt();
+        this.ID = sc.nextLine();
         sc.nextLine();
         System.out.println("Enter the name of the bank:");
         this.name = sc.nextLine();
@@ -41,6 +41,7 @@ public class Bank {
             bloodType.add(blood);
         }
         System.out.println(" New bank details added successfully.");
+        sc.close();
     }
 
     @Override

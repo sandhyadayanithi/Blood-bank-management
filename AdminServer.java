@@ -50,7 +50,7 @@ public class AdminServer {
     private static synchronized void loadBankData() {
         File f = new File("BloodBank.txt");
         if(!f.exists()) {
-            System.out.println(" BloodBank.txt not found.");
+            System.out.println("BloodBank.txt not found.");
             return;
         }
 
@@ -59,37 +59,37 @@ public class AdminServer {
             String line;
             while((line = br.readLine()) != null) {
                 String[] data = line.split(",");
-                if(data.length >= 3) {
-                    Bank bank = new Bank();
-                    try {
-                        bank.ID = Integer.parseInt(data[0].trim());
-                    } catch(Exception e) { continue; } // skip invalid lines
-                    bank.name = data[1].trim();
-                    bank.location = data[2].trim();
+                if(data.length < 5) continue; // skip invalid lines
 
-                    // Parse blood types
-                    if(data.length > 3) {
-                        for(int i = 3; i < data.length; i += 2) {
-                            if(i + 1 < data.length) {
-                                Blood blood = new Blood();
-                                blood.type = data[i].trim();
-                                try {
-                                    blood.availableQty = Double.parseDouble(data[i+1].trim());
-                                } catch(Exception e){ blood.availableQty = 0; }
-                                bank.bloodType.add(blood);
-                            }
-                        }
-                    }
-                    banks.add(bank);
+                Bank bank = new Bank();
+                bank.ID = data[0].trim();
+                bank.name = data[1].trim();
+
+                Blood blood = new Blood();
+                blood.type = data[2].trim();
+                try {
+                    blood.availableQty = Double.parseDouble(data[3].trim());
+                } catch(Exception e) {
+                    blood.availableQty = 0;
                 }
+
+                bank.bloodType.add(blood); // one blood type per line
+                bank.location = data[4].trim();
+
+                // Optional: you can store contact info, email, last updated if needed
+                // String contact = data[5].trim();
+                // String email = data[6].trim();
+                // String lastUpdated = data[7].trim();
+
+                banks.add(bank);
             }
         } catch(Exception e) {
             System.out.println("Error loading bank data: " + e.getMessage());
         }
 
-        // Build location list from loaded banks
         buildLocationList(banks);
     }
+
 
     private static void buildLocationList(ArrayList<Bank> bankList) {
         for (Bank bank : bankList) {
@@ -256,35 +256,35 @@ public class AdminServer {
                 String bloodType = client[3].trim();
                 double requiredQty = Double.parseDouble(client[4].trim());
 
-                // Find a bank in the same location with sufficient quantity
+                // Search for a matching bank entry (one blood type per line)
                 Bank foundBank = null;
-                for (Bank bank : banks) {
-                    if (bank.location.equalsIgnoreCase(clientLocation)) {
-                        for (Blood blood : bank.bloodType) {
-                            if (blood.type.equalsIgnoreCase(bloodType) && blood.availableQty >= requiredQty) {
-                                foundBank = bank;
-                                break;
-                            }
-                        }
-                    }
-                    if (foundBank != null) break;
-                }
+                Blood foundBlood = null;
 
-                if (foundBank != null) {
-                    // Allocate the blood
-                    for (Blood blood : foundBank.bloodType) {
-                        if (blood.type.equalsIgnoreCase(bloodType)) {
-                            blood.availableQty -= requiredQty;
+                for (Bank bank : banks) {
+                    // Trim both sides for safety
+                    if (bank.location.trim().equalsIgnoreCase(clientLocation) &&
+                        bank.bloodType.size() > 0) {
+
+                        Blood blood = bank.bloodType.get(0); // Each bank entry has one blood type
+                        if (blood.type.trim().equalsIgnoreCase(bloodType) && blood.availableQty >= requiredQty) {
+                            foundBank = bank;
+                            foundBlood = blood;
                             break;
                         }
                     }
-                    client[5] = "Allocated";
+                }
+
+                if (foundBank != null && foundBlood != null) {
+                    // Allocate the blood
+                    foundBlood.availableQty -= requiredQty;
+
+                    client[6] = "Allocated";
                     System.out.println("✅ Blood allocated successfully!");
                     System.out.println("   Client: " + clientName + " (ID: " + clientID + ")");
                     System.out.println("   Bank: " + foundBank.name + " | Location: " + foundBank.location);
                     System.out.println("   Blood Type: " + bloodType + " | Quantity: " + requiredQty);
                 } else {
-                    client[5] = "Still in Need";
+                    client[6] = "Still in Need";
                     System.out.println("❌ No sufficient units available at this location for " + clientName);
                 }
 
@@ -296,10 +296,11 @@ public class AdminServer {
             System.out.println("❌ Client not found.");
         }
 
-        // Save updated clients and banks (only updates quantities, preserves other data)
+        // Save updated clients and banks
         saveClients(clients);
         saveBanks();
     }
+
 
 
     private static synchronized void addNewBank(Scanner sc){
@@ -340,60 +341,63 @@ public class AdminServer {
 }
 
     private static synchronized void saveBanks() {
-    File f = new File("BloodBank.txt");
-    if (!f.exists()) return;
+        File f = new File("BloodBank.txt");
+        if (!f.exists()) return;
 
-    try {
-        // Read existing file
-        List<String> lines = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(f))) {
-            String header = br.readLine();
-            lines.add(header); // preserve header
-            String line;
-            while ((line = br.readLine()) != null) {
-                lines.add(line);
-            }
-        }
-
-        // Update only quantities in memory
-        for (int i = 1; i < lines.size(); i++) { // skip header
-            String[] parts = lines.get(i).split(",");
-            for (int j = 0; j < parts.length; j++) parts[j] = parts[j].trim();
-
-            // Match bank in memory
-            Optional<Bank> bankOpt = banks.stream()
-                    .filter(b -> b.ID == Integer.parseInt(parts[0]))
-                    .findFirst();
-
-            if (bankOpt.isPresent()) {
-                Bank bank = bankOpt.get();
-                // Update only blood quantities
-                for (int k = 3; k < parts.length; k += 2) {
-                    String type = parts[k];
-                    Optional<Blood> b = bank.bloodType.stream()
-                            .filter(x -> x.type.equalsIgnoreCase(type))
-                            .findFirst();
-                    if (b.isPresent()) {
-                        parts[k + 1] = String.valueOf(b.get().availableQty);
-                    }
+        try {
+            // Read existing file
+            List<String> lines = new ArrayList<>();
+            try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+                String header = br.readLine();
+                lines.add(header); // preserve header
+                String line;
+                while ((line = br.readLine()) != null) {
+                    lines.add(line);
                 }
             }
 
-            lines.set(i, String.join(", ", parts));
-        }
+            // Update quantities based on memory (banks list)
+            for (int i = 1; i < lines.size(); i++) { // skip header
+                String[] parts = lines.get(i).split(",");
+                for (int j = 0; j < parts.length; j++) parts[j] = parts[j].trim();
 
-        // Write back
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(f))) {
-            for (String line : lines) {
-                bw.write(line);
-                bw.newLine();
+                String bankID = parts[0];
+                String bloodType = parts[2]; // blood type column
+                double updatedQty = -1;
+
+                // Find the corresponding bank and blood type
+                for (Bank bank : banks) {
+                    if (bank.ID.equals(bankID)) {
+                        for (Blood b : bank.bloodType) {
+                            if (b.type.equalsIgnoreCase(bloodType)) {
+                                updatedQty = b.availableQty;
+                                break;
+                            }
+                        }
+                    }
+                    if (updatedQty != -1) break;
+                }
+
+                if (updatedQty != -1) {
+                    parts[3] = String.valueOf(updatedQty); // update quantity column
+                }
+
+                lines.set(i, String.join(", ", parts));
             }
-        }
 
-    } catch (Exception e) {
-        e.printStackTrace();
+            // Write back to file
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(f))) {
+                for (String line : lines) {
+                    bw.write(line);
+                    bw.newLine();
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-}
+
 
     private static synchronized String getClientStatus(String clientId){
     File f = new File("Clients.txt");
