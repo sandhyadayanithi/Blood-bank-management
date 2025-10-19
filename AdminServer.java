@@ -234,11 +234,11 @@ public class AdminServer {
         boolean foundClient = false;
 
         for (String[] client : clients) {
-            if (client[0].trim().equalsIgnoreCase(clientName)) {
+            if (client[1].trim().equalsIgnoreCase(clientName)) {
                 foundClient = true;
-                String clientLocation = client[1].trim();
-                String bloodType = client[2].trim();
-                double requiredQty = Double.parseDouble(client[3].trim());
+                String clientLocation = client[2].trim();
+                String bloodType = client[3].trim();
+                double requiredQty = Double.parseDouble(client[4].trim());
 
                 // Use location-based search to find nearest bank
                 Bank foundBank = BloodSearch.findNearestBank(
