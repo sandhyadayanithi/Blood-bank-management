@@ -25,13 +25,13 @@ public class Main {
                     }
                     System.out.println("Starting Admin Server...");
                     // Run AdminServer on the current thread
-                    AdminServer.main(new String[]{});
+                    AdminServer.adminMain(sc);
                     break;
 
                 case 2:
                     System.out.println("Starting Client Application...");
                     // Run Client on the current thread
-                    Client.main(new String[]{});
+                    Client.clientMain(sc);
                     break;
 
                 case 3:

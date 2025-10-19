@@ -20,8 +20,7 @@ public class Bank {
     }
 
     // for adding new bank
-    public void getDetails() {
-        Scanner sc = new Scanner(System.in);
+    public void getDetails(Scanner sc) {
 
         System.out.println("Enter the bank details:");
 

@@ -7,8 +7,7 @@ public class Client {
     private static final String SERVER_IP = "127.0.0.1"; // change if server is remote
     private static final int SERVER_PORT = 5000;
 
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
+    public static void clientMain(Scanner sc) {
         int choice;
 
         do {
@@ -35,7 +34,6 @@ public class Client {
             }
         } while (choice != 3);
 
-        sc.close();
     }
 
     // --- Register new client (sends data to server) ---

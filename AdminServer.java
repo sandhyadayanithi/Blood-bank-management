@@ -1,5 +1,4 @@
 import java.io.*;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.net.*;
 
@@ -11,7 +10,7 @@ public class AdminServer {
     private static LocationList locationList = new LocationList();
     private static ArrayList<Bank> banks = new ArrayList<>();
 
-    public static void main(String[] args) {
+    public static void adminMain(Scanner sc) {
         // Initialize bank data on server startup
         System.out.println(" Initializing bank data...");
         loadBankData();
@@ -21,7 +20,6 @@ public class AdminServer {
         new Thread(() -> listenToClients()).start();
 
         // Admin menu in main thread
-        Scanner sc = new Scanner(System.in);
         int choice;
         do {
             System.out.println("\n=== ADMIN MENU ===");
@@ -43,7 +41,6 @@ public class AdminServer {
                 default: System.out.println("Invalid choice!");
             }
         } while (choice != 5);
-        sc.close();
     }
 
     // --- Load bank data and build location list ---
@@ -164,16 +161,16 @@ public class AdminServer {
                     synchronized(AdminServer.class){
                         appendClient(clientData);
                     }
-                    out.println("✅ Registration successful! Your request is pending admin allocation.");
+                    out.println("Registration successful!");
                 } else if(command.startsWith("STATUS")){
                     String[] parts = command.split(":", 2);
                     if(parts.length < 2 || parts[1].trim().isEmpty()){
-                        out.println("❌ Invalid request. Name missing.");
+                        out.println("Invalid request. Name missing.");
                     } else {
                         out.println(getClientStatus(parts[1].trim()));
                     }
                 } else {
-                    out.println("❌ Unknown command");
+                    out.println("Unknown command");
                 }
             } catch(Exception e){ e.printStackTrace(); }
             finally{ try{socket.close();}catch(Exception ignored){} }
@@ -306,7 +303,7 @@ public class AdminServer {
     private static synchronized void addNewBank(Scanner sc){
         loadBankData();      // Load current data
         Bank newBank = new Bank();
-        newBank.getDetails(); // Fill from user input
+        newBank.getDetails(sc); // Fill from user input
         banks.add(newBank);   // Add to list
         saveBanks();
     }
