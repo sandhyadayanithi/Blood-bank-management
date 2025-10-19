@@ -39,64 +39,79 @@ public class Client {
     }
 
     // --- Register new client (sends data to server) ---
-    private static void registerClient(Scanner sc) {
-        try (Socket socket = new Socket(SERVER_IP, SERVER_PORT);
-             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+    // --- Register new client (sends data to server) ---
+private static void registerClient(Scanner sc) {
+    try (Socket socket = new Socket(SERVER_IP, SERVER_PORT);
+         PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
-            Random rand = new Random();
-            int idNum = rand.nextInt(900) + 100; 
-            String clientId = "C" + idNum;
-            System.out.println("Your unique ID number is: "+clientId);
-            System.out.print("Enter your name: ");
-            String name = sc.nextLine();
-            System.out.print("Enter your location (city): ");
-            String location = sc.nextLine();
-            System.out.print("Enter blood type needed: ");
-            String bloodType = sc.nextLine();
-            System.out.print("Enter quantity (units): ");
-            double quantity = sc.nextDouble();
-            System.out.print("Enter urgency (days): ");
-            int urgency = sc.nextInt();
-            sc.nextLine(); // consume newline
+        Random rand = new Random();
+        int idNum = rand.nextInt(900) + 100; 
+        String clientId = "C" + idNum;
+        System.out.println("Your unique ID number is: " + clientId);
 
-            String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-            String clientData = String.join(", ",
-                    clientId,name, location, bloodType,
-                    String.valueOf(quantity),
-                    String.valueOf(urgency),
-                    "Pending", date);
-
-            // Send registration request to server
-            out.println("REGISTER");
-            out.println(clientData);
-
-            // Receive server response
-            String response = in.readLine();
-            System.out.println(response);  // shows server message
-
-            // Extra clear message for the client
-            System.out.println("Your request is pending. Please wait for admin allocation.");
-
-        } catch (IOException e) {
-            System.out.println(" Could not connect to server. Make sure AdminServer is running.");
-        }
-    }
-
-    // --- Check status of existing client request ---
-    private static void checkStatus(Scanner sc) {
         System.out.print("Enter your name: ");
         String name = sc.nextLine();
 
-        try (Socket socket = new Socket(SERVER_IP, SERVER_PORT);
-             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+        System.out.print("Enter your location (city): ");
+        String location = sc.nextLine();
 
-            out.println("STATUS:" + name);
-            System.out.println(in.readLine());
+        System.out.print("Enter blood type needed: ");
+        String bloodType = sc.nextLine();
 
-        } catch (IOException e) {
-            System.out.println(" Could not connect to server. Make sure AdminServer is running.");
-        }
+        System.out.print("Enter quantity (units): ");
+        double quantity = sc.nextDouble();
+
+        System.out.print("Enter urgency (days): ");
+        int urgency = sc.nextInt();
+        sc.nextLine(); // consume newline
+
+        String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+
+        // Construct clientData with proper index order
+        String clientData = String.join(",",
+                clientId,                 // 0: Client ID
+                name,                     // 1: Name
+                location,                 // 2: Location
+                bloodType,                // 3: Blood Type
+                String.valueOf(quantity), // 4: Quantity
+                "Pending",                // 5: Status
+                String.valueOf(urgency),  // 6: Urgency
+                date                      // 7: Request Date
+        );
+
+        // Send registration request to server
+        out.println("REGISTER");
+        out.println(clientData);
+
+        // Receive server response
+        String response = in.readLine();
+        System.out.println(response);  // shows server message
+
+        System.out.println("Your request is pending. Please wait for admin allocation.");
+
+    } catch (IOException e) {
+        System.out.println("Could not connect to server. Make sure AdminServer is running.");
     }
+}
+
+
+    // --- Check status of existing client request ---
+    // --- Check status of existing client request ---
+private static void checkStatus(Scanner sc) {
+    System.out.print("Enter your Client ID: ");
+    String clientId = sc.nextLine();
+
+    try (Socket socket = new Socket(SERVER_IP, SERVER_PORT);
+         PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+
+        out.println("STATUS:" + clientId);
+        System.out.println(in.readLine());
+
+    } catch (IOException e) {
+        System.out.println(" Could not connect to server. Make sure AdminServer is running.");
+    }
+}
+
 }
