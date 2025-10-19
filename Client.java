@@ -1,96 +1,98 @@
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Scanner;
+import java.io.*;
+import java.net.*;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.*;
 
 public class Client {
-    private String name;
-    private String location;
-    private String bloodType;
-    private double quantity;
-    private int urgency; // days needed within
-    private String status; // Pending / Allocated / Completed
-    private String requestDate;
+    private static final String SERVER_IP = "127.0.0.1"; // change if server is remote
+    private static final int SERVER_PORT = 5000;
 
-    // Constructor
-    public Client() {
-        this.status = "Pending";
-        this.requestDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-    }
-
-    // Method to collect details interactively
-    public void getDetails() {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Enter your details:");
-
-        System.out.print("Name: ");
-        this.name = sc.nextLine();
-
-        System.out.print("Location (City): ");
-        this.location = sc.nextLine();
-
-        System.out.print("Blood Type needed: ");
-        this.bloodType = sc.nextLine();
-
-        System.out.print("Quantity of blood needed in units (1 unit = 450ml): ");
-        this.quantity = sc.nextDouble();
-
-        System.out.print("Number of days within which blood is required: ");
-        this.urgency = sc.nextInt();
-
-        System.out.println("New client details added successfully.");
-        // Don't close Scanner if main program may need it again
-    }
-
-    // Convert client details to a single CSV-like line
-    @Override
-    public String toString() {
-        return String.join(", ",
-                name,
-                location,
-                bloodType,
-                String.valueOf(quantity),
-                String.valueOf(urgency),
-                status,
-                requestDate);
-    }
-
-    // Method to append client details to file
-    public void appendToFile() {
-        File file = new File("Client.txt");
-        boolean isNewFile = !file.exists() || file.length() == 0;
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
-            if (isNewFile) {
-                writer.write("Name, Location, BloodType, Quantity(units), Urgency(days), Status, RequestDate");
-                writer.newLine();
-            }
-            writer.write(this.toString());
-            writer.newLine();
-            System.out.println("✅ Client details appended to Client.txt successfully.");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // Optional: method to update status later (Allocated / Completed)
-    public void updateStatus(String newStatus) {
-        if (newStatus.equalsIgnoreCase("Pending") ||
-            newStatus.equalsIgnoreCase("Allocated") ||
-            newStatus.equalsIgnoreCase("Completed")) {
-            this.status = newStatus;
-        } else {
-            System.out.println("❌ Invalid status. Valid options: Pending / Allocated / Completed.");
-        }
-    }
-
-    // For quick testing
     public static void main(String[] args) {
-        Client c = new Client();
-        c.getDetails();
-        c.appendToFile();
+        Scanner sc = new Scanner(System.in);
+        int choice;
+
+        do {
+            System.out.println("\n--- CLIENT MENU ---");
+            System.out.println("1. Register as New Client");
+            System.out.println("2. Check Request Status");
+            System.out.println("3. Exit");
+            System.out.print("Choose an option: ");
+            choice = sc.nextInt();
+            sc.nextLine(); // consume newline
+
+            switch (choice) {
+                case 1:
+                    registerClient(sc);
+                    break;
+                case 2:
+                    checkStatus(sc);
+                    break;
+                case 3:
+                    System.out.println("Exiting client...");
+                    break;
+                default:
+                    System.out.println("Invalid choice!");
+            }
+        } while (choice != 3);
+
+        sc.close();
+    }
+
+    // --- Register new client (sends data to server) ---
+    private static void registerClient(Scanner sc) {
+        try (Socket socket = new Socket(SERVER_IP, SERVER_PORT);
+             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+
+            System.out.print("Enter your name: ");
+            String name = sc.nextLine();
+            System.out.print("Enter your location (city): ");
+            String location = sc.nextLine();
+            System.out.print("Enter blood type needed: ");
+            String bloodType = sc.nextLine();
+            System.out.print("Enter quantity (units): ");
+            double quantity = sc.nextDouble();
+            System.out.print("Enter urgency (days): ");
+            int urgency = sc.nextInt();
+            sc.nextLine(); // consume newline
+
+            String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+            String clientData = String.join(", ",
+                    name, location, bloodType,
+                    String.valueOf(quantity),
+                    String.valueOf(urgency),
+                    "Pending", date);
+
+            // Send registration request to server
+            out.println("REGISTER");
+            out.println(clientData);
+
+            // Receive server response
+            String response = in.readLine();
+            System.out.println(response);  // shows server message
+
+            // Extra clear message for the client
+            System.out.println("ℹ️ Your request is pending. Please wait for admin allocation.");
+
+        } catch (IOException e) {
+            System.out.println("❌ Could not connect to server. Make sure AdminServer is running.");
+        }
+    }
+
+    // --- Check status of existing client request ---
+    private static void checkStatus(Scanner sc) {
+        System.out.print("Enter your name: ");
+        String name = sc.nextLine();
+
+        try (Socket socket = new Socket(SERVER_IP, SERVER_PORT);
+             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+
+            out.println("STATUS:" + name);
+            System.out.println(in.readLine());
+
+        } catch (IOException e) {
+            System.out.println("❌ Could not connect to server. Make sure AdminServer is running.");
+        }
     }
 }
