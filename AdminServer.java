@@ -194,115 +194,112 @@ public class AdminServer {
     }
 
     
-private static synchronized void viewPendingClients() {
-    File f = new File("Clients.txt");
-    if (!f.exists()) {
-        System.out.println("No clients found.");
-        return;
-    }
-
-    try (BufferedReader br = new BufferedReader(new FileReader(f))) {
-        String header = br.readLine(); // read header
-        if (header == null) {
-            System.out.println("Clients.txt is empty.");
+    private static synchronized void viewPendingClients() {
+        File f = new File("Clients.txt");
+        if (!f.exists()) {
+            System.out.println("No clients found.");
             return;
         }
 
-        List<String> pendingLines = new ArrayList<>();
-        String line;
-        while ((line = br.readLine()) != null) {
-            if (line.trim().isEmpty()) continue;
-
-            // Normalize commas and spacing
-            String[] data = line.split("\\s*,\\s*");
-            String joined = String.join(",", data);
-
-            // Try to find "Pending" or "Still in Need" anywhere
-            if (joined.toLowerCase().contains("pending") || joined.toLowerCase().contains("still in need")) {
-                pendingLines.add(joined.trim());
+        try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+            String header = br.readLine(); // read header
+            if (header == null) {
+                System.out.println("Clients.txt is empty.");
+                return;
             }
-        }
 
-        if (pendingLines.isEmpty()) {
-            System.out.println("No pending clients found.");
-            return;
-        }
+            List<String> pendingLines = new ArrayList<>();
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (line.trim().isEmpty()) continue;
 
-        System.out.println("\n=== Pending Client Requests ===");
-        System.out.println(header);
-        for (String p : pendingLines) {
-            System.out.println(p);
-        }
+                // Normalize commas and spacing
+                String[] data = line.split("\\s*,\\s*");
+                String joined = String.join(",", data);
 
-    } catch (Exception e) {
-        System.out.println("Error reading Clients.txt: " + e.getMessage());
-        e.printStackTrace();
+                // Try to find "Pending" or "Still in Need" anywhere
+                if (joined.toLowerCase().contains("pending") || joined.toLowerCase().contains("still in need")) {
+                    pendingLines.add(joined.trim());
+                }
+            }
+
+            if (pendingLines.isEmpty()) {
+                System.out.println("No pending clients found.");
+                return;
+            }
+
+            System.out.println("\n=== Pending Client Requests ===");
+            System.out.println(header);
+            for (String p : pendingLines) {
+                System.out.println(p);
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error reading Clients.txt: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
-}
-
-
-
 
     private static synchronized void allocateBloodInteractive(Scanner sc) {
-    System.out.print("Enter Client Name or ID to allocate blood: ");
-    String clientInput = sc.nextLine().trim();
+        System.out.print("Enter Client Name or ID to allocate blood: ");
+        String clientInput = sc.nextLine().trim();
 
-    List<String[]> clients = loadClients();
-    boolean foundClient = false;
+        List<String[]> clients = loadClients();
+        boolean foundClient = false;
 
-    for (String[] client : clients) {
-        if (client[0].trim().equalsIgnoreCase(clientInput) || client[1].trim().equalsIgnoreCase(clientInput)) {
-            foundClient = true;
-            String clientID = client[0].trim();
-            String clientName = client[1].trim();
-            String clientLocation = client[2].trim();
-            String bloodType = client[3].trim();
-            double requiredQty = Double.parseDouble(client[4].trim());
+        for (String[] client : clients) {
+            if (client[0].trim().equalsIgnoreCase(clientInput) || client[1].trim().equalsIgnoreCase(clientInput)) {
+                foundClient = true;
+                String clientID = client[0].trim();
+                String clientName = client[1].trim();
+                String clientLocation = client[2].trim();
+                String bloodType = client[3].trim();
+                double requiredQty = Double.parseDouble(client[4].trim());
 
-            // Find a bank in the same location with sufficient quantity
-            Bank foundBank = null;
-            for (Bank bank : banks) {
-                if (bank.location.equalsIgnoreCase(clientLocation)) {
-                    for (Blood blood : bank.bloodType) {
-                        if (blood.type.equalsIgnoreCase(bloodType) && blood.availableQty >= requiredQty) {
-                            foundBank = bank;
+                // Find a bank in the same location with sufficient quantity
+                Bank foundBank = null;
+                for (Bank bank : banks) {
+                    if (bank.location.equalsIgnoreCase(clientLocation)) {
+                        for (Blood blood : bank.bloodType) {
+                            if (blood.type.equalsIgnoreCase(bloodType) && blood.availableQty >= requiredQty) {
+                                foundBank = bank;
+                                break;
+                            }
+                        }
+                    }
+                    if (foundBank != null) break;
+                }
+
+                if (foundBank != null) {
+                    // Allocate the blood
+                    for (Blood blood : foundBank.bloodType) {
+                        if (blood.type.equalsIgnoreCase(bloodType)) {
+                            blood.availableQty -= requiredQty;
                             break;
                         }
                     }
+                    client[5] = "Allocated";
+                    System.out.println("✅ Blood allocated successfully!");
+                    System.out.println("   Client: " + clientName + " (ID: " + clientID + ")");
+                    System.out.println("   Bank: " + foundBank.name + " | Location: " + foundBank.location);
+                    System.out.println("   Blood Type: " + bloodType + " | Quantity: " + requiredQty);
+                } else {
+                    client[5] = "Still in Need";
+                    System.out.println("❌ No sufficient units available at this location for " + clientName);
                 }
-                if (foundBank != null) break;
-            }
 
-            if (foundBank != null) {
-                // Allocate the blood
-                for (Blood blood : foundBank.bloodType) {
-                    if (blood.type.equalsIgnoreCase(bloodType)) {
-                        blood.availableQty -= requiredQty;
-                        break;
-                    }
-                }
-                client[5] = "Allocated";
-                System.out.println("✅ Blood allocated successfully!");
-                System.out.println("   Client: " + clientName + " (ID: " + clientID + ")");
-                System.out.println("   Bank: " + foundBank.name + " | Location: " + foundBank.location);
-                System.out.println("   Blood Type: " + bloodType + " | Quantity: " + requiredQty);
-            } else {
-                client[5] = "Still in Need";
-                System.out.println("❌ No sufficient units available at this location for " + clientName);
+                break;
             }
-
-            break;
         }
-    }
 
-    if (!foundClient) {
-        System.out.println("❌ Client not found.");
-    }
+        if (!foundClient) {
+            System.out.println("❌ Client not found.");
+        }
 
-    // Save updated clients and banks (only updates quantities, preserves other data)
-    saveClients(clients);
-    saveBanks();
-}
+        // Save updated clients and banks (only updates quantities, preserves other data)
+        saveClients(clients);
+        saveBanks();
+    }
 
 
     private static synchronized void addNewBank(Scanner sc){
