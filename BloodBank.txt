@@ -1,5 +1,5 @@
 BankID, BankName, BloodGroup, Quantity, BankLocation, ContactNumber, Email, LastUpdatedDate
-BB016, HealTrust, A+, 4.0, Chennai, +91-9053461456, healtrust@bloodbank.in, 2025-03-28
+BB016, HealTrust, A+, 2.0, Chennai, +91-9053461456, healtrust@bloodbank.in, 2025-03-28
 BB074, HealTrust, A+, 50.0, Villupuram, +91-9045934543, healtrust@bloodbank.in, 2025-06-25
 BB067, HeartSource, A+, 12.0, Tirupur, +91-9083747928, heartsource@bloodbank.in, 2025-07-29
 BB093, HeartSource, A+, 23.0, Sivaganga, +91-9090877621, heartsource@bloodbank.in, 2025-09-17
@@ -99,3 +99,4 @@ BB020, SafeDonor, O-, 14.0, Cuddalore, +91-9083417364, safedonor@bloodbank.in, 2
 BB043, SafeDonor, O-, 24.0, Tirupur, +91-9063469002, safedonor@bloodbank.in, 2025-05-14
 BB035, UnityBlood, O-, 17.0, Chennai, +91-9033433108, unityblood@bloodbank.in, 2025-04-29
 BB039, VitalFlow, O-, 27.0, Thoothukudi, +91-9082751805, vitalflow@bloodbank.in, 2025-03-12
+BB879, Apollo, A+, 5.0, Chennai, +91-6374747979, apollohosp@bloodline.in, 2025-10-19

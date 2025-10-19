@@ -279,13 +279,13 @@ public class AdminServer {
                     foundBlood.availableQty -= requiredQty;
 
                     client[6] = "Allocated";
-                    System.out.println("✅ Blood allocated successfully!");
+                    System.out.println("Blood allocated successfully!");
                     System.out.println("   Client: " + clientName + " (ID: " + clientID + ")");
                     System.out.println("   Bank: " + foundBank.name + " | Location: " + foundBank.location);
                     System.out.println("   Blood Type: " + bloodType + " | Quantity: " + requiredQty);
                 } else {
                     client[6] = "Still in Need";
-                    System.out.println("❌ No sufficient units available at this location for " + clientName);
+                    System.out.println("No sufficient units available at this location for " + clientName);
                 }
 
                 break;
@@ -304,9 +304,10 @@ public class AdminServer {
 
 
     private static synchronized void addNewBank(Scanner sc){
+        loadBankData();      // Load current data
         Bank newBank = new Bank();
-        newBank.getDetails();
-        banks.add(newBank);
+        newBank.getDetails(); // Fill from user input
+        banks.add(newBank);   // Add to list
         saveBanks();
     }
 
@@ -342,21 +343,26 @@ public class AdminServer {
 
     private static synchronized void saveBanks() {
         File f = new File("BloodBank.txt");
-        if (!f.exists()) return;
 
         try {
-            // Read existing file
+            // ✅ Step 1: Read existing file (if it exists)
             List<String> lines = new ArrayList<>();
-            try (BufferedReader br = new BufferedReader(new FileReader(f))) {
-                String header = br.readLine();
-                lines.add(header); // preserve header
-                String line;
-                while ((line = br.readLine()) != null) {
-                    lines.add(line);
+            boolean hasHeader = false;
+            if (f.exists()) {
+                try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+                    String header = br.readLine();
+                    if (header != null && !header.isBlank()) {
+                        lines.add(header); // preserve header
+                        hasHeader = true;
+                    }
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        lines.add(line);
+                    }
                 }
             }
 
-            // Update quantities based on memory (banks list)
+            // ✅ Step 2: Update existing entries (same as before)
             for (int i = 1; i < lines.size(); i++) { // skip header
                 String[] parts = lines.get(i).split(",");
                 for (int j = 0; j < parts.length; j++) parts[j] = parts[j].trim();
@@ -365,7 +371,6 @@ public class AdminServer {
                 String bloodType = parts[2]; // blood type column
                 double updatedQty = -1;
 
-                // Find the corresponding bank and blood type
                 for (Bank bank : banks) {
                     if (bank.ID.equals(bankID)) {
                         for (Blood b : bank.bloodType) {
@@ -379,14 +384,45 @@ public class AdminServer {
                 }
 
                 if (updatedQty != -1) {
-                    parts[3] = String.valueOf(updatedQty); // update quantity column
+                    parts[3] = String.valueOf(updatedQty);
                 }
 
                 lines.set(i, String.join(", ", parts));
             }
 
-            // Write back to file
+            // ✅ Step 3: Append any *new* bank entries not found in the file
+            Set<String> existingKeys = new HashSet<>();
+            for (int i = 1; i < lines.size(); i++) {
+                String[] parts = lines.get(i).split(",");
+                existingKeys.add(parts[0].trim() + "_" + parts[2].trim()); // unique key = ID + BloodType
+            }
+
+            for (Bank bank : banks) {
+                for (Blood blood : bank.bloodType) {
+                    String key = bank.ID + "_" + blood.type;
+                    if (!existingKeys.contains(key)) {
+                        String today = java.time.LocalDate.now().toString();
+                        String newLine = String.join(", ",
+                                bank.ID,
+                                bank.name,
+                                blood.type,
+                                String.valueOf(blood.availableQty),
+                                bank.location,
+                                bank.contactNumber,
+                                bank.email,
+                                today
+                        );
+                        lines.add(newLine);
+                    }
+                }
+            }
+
+            // ✅ Step 4: Write everything back
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(f))) {
+                if (!hasHeader) {
+                    bw.write("BankID, BankName, BloodType, Quantity, Location, Contact, Email, LastUpdated");
+                    bw.newLine();
+                }
                 for (String line : lines) {
                     bw.write(line);
                     bw.newLine();
@@ -397,6 +433,7 @@ public class AdminServer {
             e.printStackTrace();
         }
     }
+
 
 
     private static synchronized String getClientStatus(String clientId){
