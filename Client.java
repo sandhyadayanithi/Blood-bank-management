@@ -45,8 +45,8 @@ public class Client {
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
             Random rand = new Random();
-            int idNum = rand.nextInt(9000) + 1000; 
-            String clientId = "C" + idNum;
+            int idNum = rand.nextInt(900) + 100; 
+            String clientId = "BB" + idNum;
             System.out.println("Your unique ID number is: "+clientId);
             System.out.print("Enter your name: ");
             String name = sc.nextLine();
