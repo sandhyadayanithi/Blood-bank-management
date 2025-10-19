@@ -32,7 +32,7 @@ class BloodBankRecord {
     }
 }
 
-public class Data {
+public class BloodBankData {
     public static void main(String[] args) {
         List<String> bloodGroups = Arrays.asList("A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-");
         List<String> bankNames = Arrays.asList("LifeLine", "RedHope", "VitalFlow", "PureBlood", "CityCare",
