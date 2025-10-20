@@ -58,34 +58,29 @@ private static void registerClient(Scanner sc) {
         String bloodType = sc.nextLine();
 
         System.out.print("Enter quantity (units): ");
-        double quantity = sc.nextDouble();
+        double quantity = Double.parseDouble(sc.nextLine()); // read full line and parse
 
         System.out.print("Enter urgency (days): ");
-        int urgency = sc.nextInt();
-        sc.nextLine(); // consume newline
+        int urgency = Integer.parseInt(sc.nextLine()); // read full line and parse
 
         String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 
-        // Construct clientData with proper index order
         String clientData = String.join(",",
-                clientId,                 // 0: Client ID
-                name,                     // 1: Name
-                location,                 // 2: Location
-                bloodType,                // 3: Blood Type
-                String.valueOf(quantity), // 4: Quantity
-                "Pending",                // 5: Status
-                String.valueOf(urgency),  // 6: Urgency
-                date                      // 7: Request Date
+                clientId,
+                name,
+                location,
+                bloodType,
+                String.valueOf(quantity),
+                "Pending",
+                String.valueOf(urgency),
+                date
         );
 
-        // Send registration request to server
         out.println("REGISTER");
         out.println(clientData);
 
-        // Receive server response
         String response = in.readLine();
-        System.out.println(response);  // shows server message
-
+        System.out.println(response);
         System.out.println("Your request is pending. Please wait for admin allocation.");
 
     } catch (IOException e) {
