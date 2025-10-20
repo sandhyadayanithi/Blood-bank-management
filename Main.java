@@ -11,30 +11,33 @@ public class Main {
             System.out.println("\n=== BLOOD BANK SYSTEM MAIN MENU ===");
             System.out.println("1. Start Admin Server");
             System.out.println("2. Start Client Application");
-            System.out.println("3. Exit");
+            System.out.println("3. Start Donor Application");
+            System.out.println("4. Exit");
             System.out.print("Select option: ");
             choice = sc.nextInt();
-            sc.nextLine(); // consume newline
+            sc.nextLine();
 
             switch (choice) {
                 case 1:
-                    // Check if port 5000 is available
                     if (!isPortAvailable(5000)) {
-                        System.out.println(" AdminServer already running on port 5000. Start client instead.");
+                        System.out.println("AdminServer already running on port 5000. Start client instead.");
                         break;
                     }
                     System.out.println("Starting Admin Server...");
-                    // Run AdminServer on the current thread
                     AdminServer.adminMain(sc);
                     break;
 
                 case 2:
                     System.out.println("Starting Client Application...");
-                    // Run Client on the current thread
                     Client.clientMain(sc);
                     break;
 
                 case 3:
+                    System.out.println("Starting Donor Application...");
+                    Donor.donorMain(sc);
+                    break;
+
+                case 4:
                     System.out.println("Exiting system...");
                     break;
 
@@ -42,12 +45,10 @@ public class Main {
                     System.out.println("Invalid choice!");
             }
 
-        } while (choice != 3);
-
+        } while (choice != 4);
         sc.close();
     }
 
-    // Utility method to check if a port is available
     private static boolean isPortAvailable(int port) {
         try (ServerSocket ignored = new ServerSocket(port)) {
             return true;
