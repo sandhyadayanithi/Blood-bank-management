@@ -141,79 +141,123 @@ java Main
 
 ## 📖 Usage Guide
 
-### For Admins
+# 🩸 Blood Bank System – Usage Guide
 
-**Starting the Admin Server:**
-1. Run the application and select "1" (Start Admin Server)
-2. The system initializes bank data from `BloodBank.txt`
-3. Location list is built automatically
+## ⚙️ System Setup
 
-**Admin Menu Options:**
+To run the full application, open **three separate terminals**:
 
-| Option | Action |
-|--------|--------|
-| 1 | View all registered blood banks and their inventory |
-| 2 | See all pending client blood requests |
-| 3 | Allocate blood from nearby banks to pending clients |
-| 4 | Register a new blood bank in the system |
-| 5 | Add a donor to the blood bank inventory |
-| 6 | Send emergency blood request message to matching donors |
-| 7 | Exit admin panel |
+1. **Terminal 1** – Run `Main.java` and select **`1` (Start Admin Server)**
+   ➜ The Admin Server **must be started first**.
 
-**Allocating Blood:**
-- Enter client name or ID
-- System finds matching bank in client's location
-- If sufficient blood available, allocation succeeds
-- If not available, system automatically notifies matching donors
-- Client status updates to "Allocated" or "Still in Need"
-- Admin can view willing donor responses
+2. **Terminal 2** – Run `Main.java` again and select either **`2` (Start Client Application)** or **`3` (Start Donor Application)**.
 
-**Adding Donor to Bank:**
-- Enter Donor ID from the Donors.txt file
-- System creates a new bank entry with donor's blood
-- Donor's contribution is added to inventory
-- Automatically refreshes bank data
+3. **Terminal 3** – Run `Main.java` once more for the remaining role (Client or Donor).
 
-**Sending Emergency Messages:**
-- Enter Client ID requiring urgent blood
-- System finds up to 3 donors with matching blood type
-- Emergency notifications sent to DonorMessages.txt
-- Donors receive alerts when they check their portal
+> **Note:** The Admin Server must always be running before starting any Client or Donor instances.
 
 ---
 
-### For Clients
+## 👩‍💼 For Admins
 
-**Starting Client Application:**
-1. Run the application and select "2" (Start Client Application)
-2. Choose "Register as New Client"
-3. Provide your details (name, location, blood type, quantity, urgency)
-4. Receive a unique Client ID
+### Starting the Admin Server
 
-**Checking Request Status:**
-1. Choose "Check Request Status"
-2. Enter your Client ID
-3. View allocation status and quantity details
+* Run the application and select **`1` (Start Admin Server)**.
+* The system initializes bank data from **`BloodBank.txt`**.
+* Location list is built automatically.
+
+### Admin Menu Options
+
+| Option | Action                                                  |
+| :----: | ------------------------------------------------------- |
+|    1   | View all registered blood banks and their inventory     |
+|    2   | See all pending client blood requests                   |
+|    3   | Allocate blood from nearby banks to pending clients     |
+|    4   | Register a new blood bank in the system                 |
+|    5   | Add a donor to the blood bank inventory                 |
+|    6   | Send emergency blood request message to matching donors |
+|    7   | Exit admin panel                                        |
+
+---
+
+### Allocating Blood
+
+1. Enter **client name or ID**.
+2. System finds matching bank in the client’s location.
+3. If sufficient blood is available, allocation succeeds.
+4. If not, system automatically notifies matching donors.
+5. Client status updates to **"Allocated"** or **"Still in Need"**.
+6. Admin can view donor responses as they come in.
 
 ---
 
-### For Donors
+### Adding Donor to Bank
 
-**Starting Donor Application:**
-1. Run the application and select "3" (Start Donor Application)
-2. Choose "Register as New Donor"
-3. Provide details (name, blood type, location, quantity willing to donate)
-4. Receive a unique Donor ID
-
-**Checking Donation Requests:**
-1. Choose "Check Donation Requests"
-2. Enter your Donor ID
-3. View pending requests matching your blood type
-4. Respond "yes" to donate or "no" to skip
-5. Your willingness is recorded and admin is notified
-6. Your donation history automatically updates
+1. Enter **Donor ID** from the `Donors.txt` file.
+2. System creates a new bank entry with donor’s blood.
+3. Donor’s contribution is added to the inventory.
+4. Bank data automatically refreshes.
 
 ---
+
+### Sending Emergency Messages
+
+1. Enter **Client ID** requiring urgent blood.
+2. System finds up to **3 donors** with matching blood type.
+3. Emergency notifications are saved to **`DonorMessages.txt`**.
+4. Donors receive alerts the next time they open their portal.
+
+---
+
+## 🧍 For Clients
+
+### Starting Client Application
+
+1. Run the application and select **`2` (Start Client Application)**.
+2. Choose **"Register as New Client"**.
+3. Provide your details:
+
+   * Name
+   * Location
+   * Blood type
+   * Quantity
+   * Urgency
+4. Receive a **unique Client ID**.
+
+### Checking Request Status
+
+1. Choose **"Check Request Status"**.
+2. Enter your **Client ID**.
+3. View your allocation status and quantity details.
+
+---
+
+## 💉 For Donors
+
+### Starting Donor Application
+
+1. Run the application and select **`3` (Start Donor Application)**.
+2. Choose **"Register as New Donor"**.
+3. Provide details:
+   * Name
+   * Blood type
+   * Location
+   * Quantity willing to donate
+4. Receive a **unique Donor ID**.
+
+### Checking Donation Requests
+
+1. Choose **"Check Donation Requests"**.
+2. Enter your **Donor ID**.
+3. View pending requests that match your blood type.
+4. Respond **"yes"** to donate or **"no"** to skip.
+5. Your willingness is recorded and the admin is notified.
+6. Your donation history automatically updates.
+
+---
+
+**Tip:** Always ensure the Admin Server is running before performing any Client or Donor actions. Otherwise, requests and updates will not synchronize correctly.
+
 
 ## 📁 File Structure
 
