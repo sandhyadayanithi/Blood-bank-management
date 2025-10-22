@@ -34,7 +34,7 @@ public class Donor {
         } while (choice != 3);
     }
 
-    // --- Register a new donor ---
+    // Register a new donor 
     private static void registerDonor(Scanner sc) {
         try {
             File f = new File("Donors.txt");
@@ -72,15 +72,15 @@ public class Donor {
             bw.flush();
             bw.close();
 
-            System.out.println("✅ Registration successful! Thank you for being a donor.");
+            System.out.println("Registration successful! Thank you for being a donor.");
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    // --- Check if any donation requests are pending for this donor ---
-    // --- Check if any donation requests are pending for this donor ---
+    
+// Check if any donation requests are pending for this donor 
 private static void checkRequests(Scanner sc) {
     System.out.print("Enter your Donor ID: ");
     String donorID = sc.nextLine().trim();
@@ -129,7 +129,7 @@ private static void checkRequests(Scanner sc) {
                         bw.write(String.join(", ", donorID, clientID, bloodType, location, qty, today));
                         bw.newLine();
                         bw.flush();
-                        System.out.println("✅ Your willingness has been recorded for admin to process.");
+                        System.out.println("Your willingness has been recorded for admin to process.");
                     } catch (IOException e) {
                         System.out.println("Error saving to WillingDonors.txt: " + e.getMessage());
                     }
@@ -143,7 +143,7 @@ private static void checkRequests(Scanner sc) {
             }
         }
 
-        // Rewrite messages file (keep header)
+        // Rewrite messages file 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(msgFile))) {
             if (header != null) {
                 bw.write(header);
@@ -165,7 +165,7 @@ private static void checkRequests(Scanner sc) {
 }
 
 
-    // --- Update donor’s total quantity and last donation date ---
+ 
     private static void updateDonorRecord(String donorID, double donatedQty) {
         File file = new File("Donors.txt");
         List<String> lines = new ArrayList<>();
