@@ -11,7 +11,6 @@ public class AdminServer {
     private static ArrayList<Bank> banks = new ArrayList<>();
 
     public static void adminMain(Scanner sc) {
-        // Initialize bank data on server startup
         System.out.println(" Initializing bank data...");
         loadBankData();
         System.out.println(" Bank data loaded and location list built.\n");
@@ -19,7 +18,7 @@ public class AdminServer {
         // Start a thread to handle incoming client registrations
         new Thread(() -> listenToClients()).start();
 
-        // Admin menu in main thread
+        // Main Thread
         int choice;
         do {
     System.out.println("\n=== ADMIN MENU ===");
@@ -28,11 +27,11 @@ public class AdminServer {
     System.out.println("3. Allocate Blood to Client");
     System.out.println("4. Add New Bank");
     System.out.println("5. Add Donor to Bank");
-    System.out.println("6. Send Emergency Message");  // ✅ moved up
-    System.out.println("7. Exit Admin");              // ✅ now last option
+    System.out.println("6. Send Emergency Message");  
+    System.out.println("7. Exit Admin");              
     System.out.print("Choose an option: ");
     choice = sc.nextInt();
-    sc.nextLine(); // consume newline
+    sc.nextLine(); 
 
     switch (choice) {
         case 1:
@@ -51,7 +50,7 @@ public class AdminServer {
             addDonorToBank(sc);
             break;
         case 6:
-            sendEmergencyMessage(sc);   // ✅ new order
+            sendEmergencyMessage(sc);   
             break;
         case 7:
             System.out.println("Exiting Admin...");
@@ -64,8 +63,7 @@ public class AdminServer {
 } while (running);
     }
 
-
-    // --- Load bank data and build location list ---
+ 
     private static synchronized void loadBankData() {
         File f = new File("BloodBank.txt");
         if(!f.exists()) {
@@ -74,11 +72,11 @@ public class AdminServer {
         }
 
         try(BufferedReader br = new BufferedReader(new FileReader(f))) {
-            String header = br.readLine(); // skip header
+            String header = br.readLine(); 
             String line;
             while((line = br.readLine()) != null) {
                 String[] data = line.split(",");
-                if(data.length < 5) continue; // skip invalid lines
+                if(data.length < 5) continue; 
 
                 Bank bank = new Bank();
                 bank.ID = data[0].trim();
@@ -94,12 +92,6 @@ public class AdminServer {
 
                 bank.bloodType.add(blood); // one blood type per line
                 bank.location = data[4].trim();
-
-                // Optional: you can store contact info, email, last updated if needed
-                // String contact = data[5].trim();
-                // String email = data[6].trim();
-                // String lastUpdated = data[7].trim();
-
                 banks.add(bank);
             }
         } catch(Exception e) {
@@ -109,7 +101,6 @@ public class AdminServer {
         buildLocationList(banks);
     }
 
-    // --- Send emergency alert to top 3 matching donors ---
 private static synchronized void sendEmergencyMessage(Scanner sc) {
     System.out.print("Enter Client ID to send emergency message for: ");
     String clientID = sc.nextLine().trim();
@@ -124,7 +115,7 @@ private static synchronized void sendEmergencyMessage(Scanner sc) {
     String location = null;
     double neededQty = 0;
 
-    // Step 1: Find the client's blood requirement
+    // Find the client's blood requirement
     try (BufferedReader br = new BufferedReader(new FileReader(clientsFile))) {
         br.readLine(); // skip header
         String line;
@@ -146,7 +137,7 @@ private static synchronized void sendEmergencyMessage(Scanner sc) {
         return;
     }
 
-    // Step 2: Find up to 3 matching donors by blood type
+    // Find up to 3 matching donors by blood type
     File donorFile = new File("Donors.txt");
     File msgFile = new File("DonorMessages.txt");
 
@@ -174,7 +165,7 @@ private static synchronized void sendEmergencyMessage(Scanner sc) {
         return;
     }
 
-    // Step 3: Write messages to DonorMessages.txt
+    // Write messages to DonorMessages.txt
     try (BufferedWriter bw = new BufferedWriter(new FileWriter(msgFile, true))) {
         boolean writeHeader = !msgFile.exists() || msgFile.length() == 0;
         if (writeHeader) {
@@ -188,7 +179,7 @@ private static synchronized void sendEmergencyMessage(Scanner sc) {
             bw.newLine();
         }
         bw.flush();
-        System.out.println("✅ Emergency messages sent to donors: " + String.join(", ", matchingDonors));
+        System.out.println("Emergency messages sent to donors: " + String.join(", ", matchingDonors));
 
     } catch (Exception e) {
         e.printStackTrace();
@@ -207,7 +198,7 @@ private static synchronized void sendEmergencyMessage(Scanner sc) {
     }
 
     try (BufferedReader br = new BufferedReader(new FileReader(donorFile))) {
-        String header = br.readLine(); // skip header
+        String header = br.readLine(); 
         String line;
         boolean found = false;
 
@@ -252,23 +243,23 @@ private static synchronized void sendEmergencyMessage(Scanner sc) {
                     bw.flush();
                 }
 
-                System.out.println("✅ Donor added to Blood Bank successfully!");
-                System.out.println("   DonorID: " + donorID);
-                System.out.println("   Created Bank: " + bankName + " (" + bankID + ")");
-                System.out.println("   Blood Type: " + bloodType + " | Location: " + location + " | Qty: " + qty);
+                System.out.println(" Donor added to Blood Bank successfully!");
+                System.out.println(" DonorID: " + donorID);
+                System.out.println(" Created Bank: " + bankName + " (" + bankID + ")");
+                System.out.println(" Blood Type: " + bloodType + " | Location: " + location + " | Qty: " + qty);
                 break;
             }
         }
 
         if (!found) {
-            System.out.println("❌ Donor ID not found in Donors.txt.");
+            System.out.println("Donor ID not found in Donors.txt.");
         }
 
     } catch (Exception e) {
         System.out.println("Error while adding donor to bank: " + e.getMessage());
     }
 
-    // Refresh in-memory data so allocation sees new bank
+    // Refresh in-memory data 
     banks.clear();
     loadBankData();
 }
@@ -305,7 +296,7 @@ private static String generateBankID() {
         }
     }
 
-    // Append new client request to file
+    // Add new client request to file
    private static synchronized void appendClient(String clientData) throws IOException {
     File f = new File("Clients.txt");
     boolean writeHeader = !f.exists() || f.length() == 0;
@@ -322,7 +313,7 @@ private static String generateBankID() {
 }
 
 
-    // --- Network listener for client registration ---
+    // Network listener
     private static void listenToClients() {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             while (running) {
@@ -366,7 +357,7 @@ private static String generateBankID() {
         }
     }
 
-    // --- Admin Menu Operations ---
+    
     private static synchronized void viewAllBanks(){
         File f = new File("BloodBank.txt");
         if(!f.exists()){ System.out.println("No banks found."); return;}
@@ -482,7 +473,7 @@ private static String generateBankID() {
 
             for (Bank bank : banks) {
                 if (bank.location.trim().equalsIgnoreCase(clientLocation) && !bank.bloodType.isEmpty()) {
-                    Blood blood = bank.bloodType.get(0); // each bank line has one blood type
+                    Blood blood = bank.bloodType.get(0); 
                     if (blood.type.trim().equalsIgnoreCase(bloodType) && blood.availableQty >= requiredQty) {
                         foundBank = bank;
                         foundBlood = blood;
@@ -494,13 +485,13 @@ private static String generateBankID() {
             if (foundBank != null && foundBlood != null) {
                 // Allocate blood
                 foundBlood.availableQty -= requiredQty;
-                client[5] = "Allocated";  // ✅ Correct index for Status
-                System.out.println("✅ Blood allocated successfully!");
+                client[5] = "Allocated";  
+                System.out.println("Blood allocated successfully!");
                 System.out.println("   Client: " + clientName + " (ID: " + clientID + ")");
                 System.out.println("   Bank: " + foundBank.name + " | Location: " + foundBank.location);
                 System.out.println("   Blood Type: " + bloodType + " | Quantity: " + requiredQty);
             } else {
-                client[5] = "Still in Need";  // ✅ Correct index for Status
+                client[5] = "Still in Need"; 
                 System.out.println("⚠ No sufficient units available at this location for " + clientName);
 
                 // Notify donors
@@ -510,7 +501,7 @@ private static String generateBankID() {
                 File willingFile = new File("WillingDonors.txt");
                 if (willingFile.exists()) {
                     try (BufferedReader br = new BufferedReader(new FileReader(willingFile))) {
-                        br.readLine(); // skip header
+                        br.readLine();
                         String line;
                         while ((line = br.readLine()) != null) {
                             String[] data = line.split("\\s*,\\s*");
@@ -524,7 +515,7 @@ private static String generateBankID() {
                 }
             }
 
-            break; // stop after processing the found client
+            break; 
         }
     }
 
@@ -541,14 +532,14 @@ private static String generateBankID() {
 
 
     private static synchronized void addNewBank(Scanner sc){
-        loadBankData();      // Load current data
+        loadBankData();     
         Bank newBank = new Bank();
-        newBank.getDetails(sc); // Fill from user input
-        banks.add(newBank);   // Add to list
+        newBank.getDetails(sc); 
+        banks.add(newBank);  
         saveBanks();
     }
 
-    // --- Helpers ---
+  
     private static synchronized List<String[]> loadClients(){
         List<String[]> clients = new ArrayList<>();
         File f = new File("Clients.txt");
@@ -582,7 +573,7 @@ private static String generateBankID() {
         File f = new File("BloodBank.txt");
 
         try {
-            // ✅ Step 1: Read existing file (if it exists)
+            // Read existing file (if it exists)
             List<String> lines = new ArrayList<>();
             boolean hasHeader = false;
             if (f.exists()) {
@@ -599,7 +590,7 @@ private static String generateBankID() {
                 }
             }
 
-            // ✅ Step 2: Update existing entries (same as before)
+            // Update existing entries (same as before)
             for (int i = 1; i < lines.size(); i++) { // skip header
                 String[] parts = lines.get(i).split(",");
                 for (int j = 0; j < parts.length; j++) parts[j] = parts[j].trim();
@@ -627,7 +618,7 @@ private static String generateBankID() {
                 lines.set(i, String.join(", ", parts));
             }
 
-            // ✅ Step 3: Append any *new* bank entries not found in the file
+            // Append any *new* bank entries not found in the file
             Set<String> existingKeys = new HashSet<>();
             for (int i = 1; i < lines.size(); i++) {
                 String[] parts = lines.get(i).split(",");
@@ -654,7 +645,7 @@ private static String generateBankID() {
                 }
             }
 
-            // ✅ Step 4: Write everything back
+            // Write everything back
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(f))) {
                 if (!hasHeader) {
                     bw.write("BankID, BankName, BloodType, Quantity, Location, Contact, Email, LastUpdated");
@@ -677,7 +668,7 @@ private static String generateBankID() {
     File f = new File("Clients.txt");
     if(!f.exists()) return "No clients found.";
     try(BufferedReader br = new BufferedReader(new FileReader(f))){
-        br.readLine(); // skip header
+        br.readLine();
         String line;
         while((line=br.readLine())!=null){
             String[] data = line.split("\\s*,\\s*");
