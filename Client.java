@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Client {
-    private static final String SERVER_IP = "127.0.0.1"; // change if server is remote
+    private static final String SERVER_IP = "127.0.0.1"; 
     private static final int SERVER_PORT = 5000;
 
     public static void clientMain(Scanner sc) {
@@ -17,8 +17,7 @@ public class Client {
             System.out.println("3. Exit");
             System.out.print("Choose an option: ");
             choice = sc.nextInt();
-            sc.nextLine(); // consume newline
-
+            sc.nextLine(); 
             switch (choice) {
                 case 1:
                     registerClient(sc);
@@ -36,8 +35,7 @@ public class Client {
 
     }
 
-    // --- Register new client (sends data to server) ---
-    // --- Register new client (sends data to server) ---
+    
 private static void registerClient(Scanner sc) {
     try (Socket socket = new Socket(SERVER_IP, SERVER_PORT);
          PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
@@ -58,11 +56,10 @@ private static void registerClient(Scanner sc) {
         String bloodType = sc.nextLine();
 
         System.out.print("Enter quantity (units): ");
-        double quantity = Double.parseDouble(sc.nextLine()); // read full line and parse
+        double quantity = Double.parseDouble(sc.nextLine());
 
         System.out.print("Enter urgency (days): ");
-        int urgency = Integer.parseInt(sc.nextLine()); // read full line and parse
-
+        int urgency = Integer.parseInt(sc.nextLine());
         String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 
         String clientData = String.join(",",
@@ -88,9 +85,8 @@ private static void registerClient(Scanner sc) {
     }
 }
 
-
-    // --- Check status of existing client request ---
-    // --- Check status of existing client request ---
+    
+//Check status of existing client request
 private static void checkStatus(Scanner sc) {
     System.out.print("Enter your Client ID: ");
     String clientId = sc.nextLine();
