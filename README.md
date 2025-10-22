@@ -141,7 +141,7 @@ java Main
 
 ## 📖 Usage Guide
 
-# 🩸 Blood Bank System – Usage Guide
+# 🩸 Blood Bank System
 
 ## ⚙️ System Setup
 
